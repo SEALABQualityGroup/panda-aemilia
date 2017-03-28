@@ -1,0 +1,53 @@
+MainModel : http://mmaemilia.ecore
+
+--cannot exist ElemTypes with the same name
+context ElemType inv elemtn_type_names:
+ElemType.allInstances() -> forAll (e1, e2 |
+									e1 <> e2 implies e1.etName <> e2.etName) 									
+
+--for all attachment, the start instance must be different from the end instance
+context Attachment inv attachment_sides:
+self.start.fromInstance <> self.end.toInstance
+
+--cannot exist instances with the same name
+context ArchiElemInstance inv instance_names:
+ArchiElemInstance.allInstances() -> forAll (e1, e2 |
+									e1 <> e2 implies e1.instanceName <> e2.instanceName)
+
+--cannot exist Architectural Interactions with the same name
+context ArchitecturalInteraction inv architectural_int_names:
+ArchitecturalInteraction.allInstances() -> forAll (e1, e2 |
+									e1 <> e2 implies e1.name <> e2.name)
+
+--each OR local interaction can be tied only to UNI local interactions
+context Attachment inv legal_attachment_cliente_server: 
+self.start.isOutput.type = InteractionType::OR implies self.end.isInput.type = InteractionType::UNI 
+
+--each AND local interaction can be tied only to UNI local interactions
+context Attachment inv legal_attachment_broadcast: 
+self.start.isOutput.type = InteractionType::AND implies self.end.isInput.type = InteractionType::UNI
+
+--each UNI local interaction can be tied only to one interaction of any type
+context Attachment inv legal_attachment_point_to_point:
+self.start.isOutput.type = InteractionType::UNI implies (self.end.isInput.type = InteractionType::UNI or
+														 self.end.isInput.type = InteractionType::AND or
+														 self.end.isInput.type = InteractionType::OR)
+
+--cannot exist constants with the same name
+context Headers::ConstInit inv constant_names:
+Headers::ConstInit.allInstances() -> forAll (e1, e2 |
+									e1 <> e2 implies e1.name <> e2.name)
+
+
+
+
+
+
+
+
+
+
+
+
+
+									

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mmaemilia:AEmiliaSpecification xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns:Behavior="http://behavior.ecore" 
+xmlns:DataType="http://datatype.ecore" 
+xmlns:Expressions="http://expressions.ecore" 
+xmlns:mmaemilia="http://mmaemilia.ecore">
+
+
+</mmaemilia:AEmiliaSpecification>

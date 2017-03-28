@@ -1,0 +1,24 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%								%
+% Performance measure specification
+%								%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+MEASURE LoadBalancerA_throughtput_pathA IS
+  ENABLED(LBA.deliver_req_best_path) -> TRANS_REWARD(1.0);
+
+MEASURE LoadBalancerB_throughtput_pathB IS
+  ENABLED(LBB.deliver_req_best_path) -> TRANS_REWARD(1.0);
+
+MEASURE DB_utilization IS
+  ENABLED(DB.transmit_data) -> STATE_REWARD(1.0);
+
+MEASURE MA_throughput IS
+	FOR_ALL i IN 1..ma_num
+		ENABLED(MA[i].trasmit_req_best_path) -> TRANS_REWARD(1.0)
+ 
+
+
+  
+
+

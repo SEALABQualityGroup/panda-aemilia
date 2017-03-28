@@ -1,0 +1,327 @@
+ARCHI_TYPE ABP_GD_Type(const boolean starting_bit      := false,
+				       const real    msg_gen_rate      := 0.005,
+				       const integer timeout_period    := 1000,
+				       const real    prop_delay_mean   := 107.0,
+				       const real    prop_delay_st_dev := 7.0,
+				       const weight  delivery_prob     := 0.95)
+
+
+ARCHI_ELEM_TYPES
+
+	ELEM_TYPE Msg_Gen_Type(const real msg_gen_rate)
+
+	    BEHAVIOR
+
+	      Msg_Gen(integer time_to_gen_next := ceil(exponential(msg_gen_rate)),
+		      integer msg_to_send      := 0;
+		      void) =
+		choice
+		{
+		  cond(msg_to_send >= 1) ->
+		    choice
+		    {
+		      <generate_msg, inf(3, 1)> . Msg_Gen_Updating(time_to_gen_next,
+								   msg_to_send - 1),
+		      <idle, inf> . Msg_Gen_Updating(time_to_gen_next,
+						     msg_to_send)
+		    },
+		  cond(msg_to_send = 0)  ->
+		    <idle, inf> . Msg_Gen_Updating(time_to_gen_next,
+						   msg_to_send)
+		};
+
+	      Msg_Gen_Updating(integer time_to_gen_next,
+			       integer msg_to_send;
+			       void) =
+		choice
+		{
+		  cond(time_to_gen_next = 0) ->
+		    <elapse_tick, _> . Msg_Gen(ceil(exponential(msg_gen_rate)),
+					       msg_to_send + 1),
+		  cond(time_to_gen_next > 0) ->
+		    <elapse_tick, _> . Msg_Gen(time_to_gen_next - 1,
+					       msg_to_send)
+		}
+
+	    INPUT_INTERACTIONS
+
+	      UNI elapse_tick
+
+	    OUTPUT_INTERACTIONS
+
+	      UNI generate_msg
+
+
+	ELEM_TYPE Sender_Type(const boolean starting_bit,
+			      const integer timeout_period)
+
+	    BEHAVIOR
+
+	      Sender(boolean       sent_bit     := starting_bit;
+		     local boolean received_bit) =
+		choice
+		{
+		  <get_msg, _> . Sender_Transmitting(sent_bit),
+		  <receive_ack?(received_bit), _> . <elapse_tick, _> . Sender(sent_bit),
+		  <elapse_tick, _> . Sender(sent_bit)
+		};
+
+	      Sender_Transmitting(boolean       sent_bit;
+				  local boolean received_bit) =
+		choice
+		{
+		  <transmit_msg!(sent_bit), inf(2, 1)> . <elapse_tick, _> . Sender_Waiting(sent_bit,
+											   timeout_period),
+		  <receive_ack?(received_bit), _> . <elapse_tick, _> . Sender_Transmitting(sent_bit),
+		  <elapse_tick, _> . Sender_Transmitting(sent_bit)
+		};
+
+	      Sender_Waiting(boolean       sent_bit,
+			     integer       time_to_timeout;
+			     local boolean received_bit) =
+		choice
+		{
+		  cond(time_to_timeout > 0) ->
+		    choice
+		    {
+		      <receive_ack?(received_bit), _> . Sender_Checking_1(sent_bit,
+									  time_to_timeout,
+									  received_bit),
+		      <elapse_tick, _> . Sender_Waiting(sent_bit,
+						        time_to_timeout - 1)
+		    },
+		  cond(time_to_timeout = 0) ->
+		    choice
+		    {
+		      <timeout, inf(2, 1)> . Sender_Retransmitting(sent_bit),
+		      <receive_ack?(received_bit), _> . Sender_Checking_2(sent_bit,
+									  received_bit)
+		    }
+		};
+
+	      Sender_Checking_1(boolean sent_bit,
+				integer time_to_timeout,
+				boolean received_bit;
+				void) =
+		choice
+		{
+		  cond(received_bit = sent_bit)  ->
+		    <elapse_tick, _> . Sender(!sent_bit),
+		  cond(received_bit != sent_bit) ->
+		    <elapse_tick, _> . Sender_Waiting(sent_bit,
+						      time_to_timeout - 1)
+		};
+
+	      Sender_Checking_2(boolean sent_bit,
+				boolean received_bit;
+				void) =
+		choice
+		{
+		  cond(received_bit = sent_bit)  ->
+		    <elapse_tick, _> . Sender(!sent_bit),
+		  cond(received_bit != sent_bit) ->
+		    <idle, inf> . Sender_Retransmitting(sent_bit)
+		};
+
+	      Sender_Retransmitting(boolean       sent_bit;
+				    local boolean received_bit) =
+		choice
+		{
+		  <transmit_msg!(sent_bit), inf(2, 1)> . <elapse_tick, _> . Sender_Waiting(sent_bit,
+											   timeout_period),
+		  <receive_ack?(received_bit), _> . Sender_Checking_2(sent_bit,
+								      received_bit),
+		  <elapse_tick, _> . Sender_Retransmitting(sent_bit)
+		}
+
+	    INPUT_INTERACTIONS
+
+	      UNI get_msg;
+		  UNI receive_ack;
+		  UNI elapse_tick
+
+	    OUTPUT_INTERACTIONS
+
+	      UNI transmit_msg
+
+
+	ELEM_TYPE Line_Type(const real	 prop_delay_mean,
+			    const real	 prop_delay_st_dev,
+			    const weight delivery_prob)
+
+	    BEHAVIOR
+
+	      Line(list(record(integer time_to_delivery,
+			       boolean tag)) prop_queue := list_cons();
+		   local boolean tagging_bit) =
+		choice
+		{
+		  <receive?(tagging_bit), _> .
+		    choice
+		    {
+		      <keep, inf(2, delivery_prob)> .
+			Line_Delivering(list_cons(prop_queue,
+					       concat(record_cons(ceil(normal(prop_delay_mean,
+										 prop_delay_st_dev)),
+								     tagging_bit)))),
+		      <lose, inf(2, 1 - delivery_prob)> . Line_Delivering(prop_queue)
+		    },
+		  <idle, inf> . Line_Delivering(prop_queue)
+		};
+
+	      Line_Delivering(list(record(integer time_to_delivery,
+				   	  boolean tag))	            prop_queue;
+			      void) =
+		choice
+		{
+		 % cond((prop_queue != list_cons()) &&  get(time_to_delivery, first(prop_queue)) <= 0) ->
+		    <deliver!(get(tag,
+				  first(prop_queue))), inf(3, 1)> . Line_Propagating(tail(prop_queue)),
+		%  cond((prop_queue = list_cons()) ||   get(time_to_delivery, first(prop_queue)) > 0) ->
+		    <idle, inf> . Line_Propagating(prop_queue)
+		};
+
+	      Line_Propagating(list(record(integer time_to_delivery,
+				           boolean tag))	     prop_queue;
+			       void) =
+		choice
+		{
+		 % cond(prop_queue != list_cons()) ->
+		    <propagate, inf(2, 1)> . Line_Updating(prop_queue,
+							   list_cons()),
+		 % cond(prop_queue = list_cons())  ->
+		    <elapse_tick, _> . Line(prop_queue)
+		};
+
+	      Line_Updating(list(record(integer time_to_delivery,
+				        boolean tag))		  prop_queue,
+			    list(record(integer time_to_delivery,
+				        boolean tag))		  new_prop_queue;
+			    void) =
+		choice
+		{
+		%  cond(prop_queue != list_cons()) ->
+		    <compute_time_to_delivery, inf(2, 1)> .
+		      Line_Updating(tail(prop_queue) 
+		      		%,
+				  %  concat(new_prop_queue,
+			       %            list_cons(record_cons(get(time_to_delivery,
+				   %                                  first(prop_queue)) - 1,
+			       %                                  get(tag,
+				    %                                 first(prop_queue)))))
+				    ),
+				    
+		%  cond(prop_queue = list_cons())  ->
+		    <elapse_tick, _> . Line(new_prop_queue)
+		}
+
+	    INPUT_INTERACTIONS
+
+	      UNI receive;
+		  UNI elapse_tick
+
+	    OUTPUT_INTERACTIONS
+
+	      UNI deliver
+
+
+	ELEM_TYPE Receiver_Type(const boolean starting_bit)
+
+	    BEHAVIOR
+
+              Receiver(boolean       expected_bit := starting_bit;
+                       local boolean received_bit) =
+		choice
+		{
+		  <receive_msg?(received_bit), _> . Receiver_Checking(expected_bit,
+								      received_bit),
+		  <elapse_tick, _> . Receiver(expected_bit)
+		};
+
+              Receiver_Checking(boolean expected_bit,
+				boolean received_bit;
+				void) =
+		choice
+		{
+		  cond(received_bit = expected_bit)  ->
+		    <consume_msg, inf(2, 1)> . Receiver_Transmitting(!expected_bit,
+								     received_bit),
+		  cond(received_bit != expected_bit) ->
+		    <idle, inf> . Receiver_Transmitting(expected_bit,
+							received_bit)
+		};
+
+              Receiver_Transmitting(boolean expected_bit,
+				    boolean received_bit;
+				    void) =
+		choice
+		{
+		  <transmit_ack!(received_bit), inf(2, 1)> . <elapse_tick, _> . Receiver(expected_bit),
+		  <elapse_tick, _> . Receiver_Transmitting(expected_bit,
+							   received_bit)
+		}
+
+	    INPUT_INTERACTIONS
+
+	      UNI receive_msg;
+		  UNI elapse_tick
+
+	    OUTPUT_INTERACTIONS
+
+	      UNI consume_msg;
+		  UNI transmit_ack
+
+
+	ELEM_TYPE Clock_Type(void)
+
+	    BEHAVIOR
+
+	      Clock(void;  void) =
+		<elapse_tick, inf> . Clock()
+
+	    INPUT_INTERACTIONS
+
+	      void
+
+	    OUTPUT_INTERACTIONS
+
+	      AND elapse_tick
+
+
+ARCHI_TOPOLOGY
+
+
+	ARCHI_ELEM_INSTANCES
+
+	  MG : Msg_Gen_Type(msg_gen_rate);
+	  S  : Sender_Type(starting_bit,
+			   timeout_period);
+	  LM : Line_Type(prop_delay_mean,
+			 prop_delay_st_dev,
+			 delivery_prob);
+	  LA : Line_Type(prop_delay_mean,
+			 prop_delay_st_dev,
+			 delivery_prob);
+	  R  : Receiver_Type(starting_bit);
+	  C  : Clock_Type()
+
+
+	ARCHI_INTERACTIONS
+
+	  R.consume_msg
+
+
+	ARCHI_ATTACHMENTS
+
+      FROM MG.generate_msg TO S.get_msg;
+      FROM S.transmit_msg  TO LM.receive;
+      FROM LM.deliver      TO R.receive_msg;
+      FROM R.transmit_ack  TO LA.receive;
+      FROM LA.deliver      TO S.receive_ack;
+	  FROM C.elapse_tick   TO MG.elapse_tick;
+	  FROM C.elapse_tick   TO S.elapse_tick;
+	  FROM C.elapse_tick   TO LM.elapse_tick;
+	  FROM C.elapse_tick   TO LA.elapse_tick;
+	  FROM C.elapse_tick   TO R.elapse_tick
+
+END

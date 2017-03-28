@@ -1,0 +1,212 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                               %
+% BoA - solution of the Pipe and Filter Architectures antipattern
+%                                                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ARCHI_TYPE boa(const integer ma_num := 5,				
+			const rate download_rate :=2441.40625,	
+			const rate upload_rate :=305.17578125,	
+			const rate balancer_rate_a :=20000000,	
+			const rate balancer_rate_b :=10000000, 
+			const rate server_req_rate:= 70000000,	
+			const rate server_result_rate:= 85995,	
+			const rate data_fetch_rate:= 36.585,	
+			const weight routing_prob_a := 0.5,	
+			const weight data_fetch_prob :=0.5,	
+			const integer buffer_size :=10)		
+
+
+ARCHI_ELEM_TYPES
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Mobile Application (MA)
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	ELEM_TYPE MA_Type(void)
+
+	    BEHAVIOR
+			
+			MobileApp(void; void) = 
+				<generate_best_path_req, inf> .<trasmit_req_best_path, inf> . <receive_best_path, _> . MobileApp()
+
+	    INPUT_INTERACTIONS
+
+			UNI receive_best_path;
+			generate_best_path_req
+
+	    OUTPUT_INTERACTIONS
+
+			UNI trasmit_req_best_path
+			
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Download Network
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	ELEM_TYPE NetDown_Type(const integer buffer_size, const rate download_rate)
+
+	    BEHAVIOR
+			
+			TransferData (integer(0..buffer_size) item_num := 0; void) = 
+				choice
+				{
+					cond(item_num < buffer_size) ->		<receive, _> . TransferData(item_num + 1),
+					cond(item_num > 0) ->				<forward, exp(download_rate)> . TransferData(item_num - 1)
+				}
+
+	    INPUT_INTERACTIONS
+
+			OR receive
+
+	    OUTPUT_INTERACTIONS
+
+			UNI forward
+			
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Upload Network
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	ELEM_TYPE NetUp_Type(const integer buffer_size, const rate upload_rate)
+
+	    BEHAVIOR
+			
+			TransferData (integer(0..buffer_size) item_num := 0; void) =  
+				choice
+				{
+					cond(item_num < buffer_size) ->		<receive, _> . TransferData(item_num + 1),
+					cond(item_num > 0) ->				<forward, exp(upload_rate)> . TransferData(item_num - 1)
+				}
+
+	    INPUT_INTERACTIONS
+
+			OR receive
+
+	    OUTPUT_INTERACTIONS
+
+			OR forward
+
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Load Balancer
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	ELEM_TYPE Balancer_Type(const integer buffer_size, const weight routing_prob_a, const rate balancer_rate_a, const rate balancer_rate_b)
+
+	    BEHAVIOR
+		
+			BalancerCalled (integer(0..buffer_size) item_num := 0; void) = 
+				choice
+				{
+					cond(item_num < buffer_size) ->		<capture_req_best_path, _> . BalancerCalled(item_num + 1),
+					cond(item_num > 0) -> 
+						choice
+						{
+					<deliver_to_a, inf(1, routing_prob_a)> . <deliver_req_best_path_a, exp(balancer_rate_a)> . BalancerCalled(item_num - 1),
+					<deliver_to_b, inf(1, 1-routing_prob_a)> . <deliver_req_best_path_b, exp(balancer_rate_b)> . BalancerCalled(item_num - 1)
+						}
+				}
+			
+
+	    INPUT_INTERACTIONS
+
+			UNI capture_req_best_path
+
+	    OUTPUT_INTERACTIONS
+
+			UNI deliver_req_best_path_a;
+			deliver_req_best_path_b
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Server
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	ELEM_TYPE Server_Type(const integer buffer_size, const rate server_req_rate, const rate server_result_rate, const weight data_fetch_prob)
+
+	  BEHAVIOR
+		
+			Start (integer(0..buffer_size) req_buffer := 0, integer(0..buffer_size) data_buffer := 0; void) = 
+				choice
+				{
+					cond(req_buffer < buffer_size) ->		<receive_req_best_path, _> . Start(req_buffer + 1, data_buffer),
+					cond(req_buffer > 0) ->
+						choice
+						{
+							<not_use_cache, inf(1, data_fetch_prob)> . <req_data, exp(server_req_rate)> . Start(req_buffer - 1, data_buffer),
+							<use_cache, inf(1, 1 - data_fetch_prob)> . <transmit_result_best_path, exp(server_result_rate)> . Start(req_buffer - 1, data_buffer)
+						},
+					cond(data_buffer < buffer_size) ->		<receive_data, _> . Start(req_buffer, data_buffer + 1),
+					cond(data_buffer > 0) ->				<transmit_result_best_path, exp(server_result_rate)> . Start(req_buffer, data_buffer - 1)
+				}
+
+	    INPUT_INTERACTIONS
+
+			UNI receive_req_best_path;
+			receive_data
+
+	    OUTPUT_INTERACTIONS
+
+			UNI transmit_result_best_path;
+			req_data
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Data Base (DB)
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	ELEM_TYPE DB_Type(const integer buffer_size, const rate data_fetch_rate)
+
+	    BEHAVIOR
+		
+			FetchData (integer(0..buffer_size) item_num := 0; void) = 
+				<receive_data_req, _>.<transmit_data, exp(data_fetch_rate)> .FetchData(item_num)
+
+	    INPUT_INTERACTIONS
+
+			OR receive_data_req
+
+	    OUTPUT_INTERACTIONS
+
+			OR transmit_data
+
+
+ARCHI_TOPOLOGY
+
+	ARCHI_ELEM_INSTANCES
+		FOR_ALL i IN 1..ma_num
+			MA[i] : MA_Type();
+		ND : NetDown_Type(buffer_size, download_rate);
+		NU : NetUp_Type(buffer_size, upload_rate);
+		LB : Balancer_Type(buffer_size, routing_prob_a, balancer_rate_a, balancer_rate_b);
+		SA : Server_Type(buffer_size, server_req_rate, server_result_rate, data_fetch_prob);
+		SB : Server_Type(buffer_size, server_req_rate, server_result_rate, data_fetch_prob);
+		DB : DB_Type(buffer_size, data_fetch_rate)
+
+		
+	ARCHI_INTERACTIONS 
+    FOR_ALL i IN 1..ma_num
+		    MA[i].generate_best_path_req
+
+
+	ARCHI_ATTACHMENTS 
+	  FOR_ALL i IN 1..ma_num
+		  FROM MA[i].trasmit_req_best_path		TO  ND.receive;
+		FROM ND.forward							TO  LB.capture_req_best_path;
+		FROM LB.deliver_req_best_path_a			TO  SA.receive_req_best_path;
+		FROM LB.deliver_req_best_path_b			TO  SB.receive_req_best_path;
+		FROM SA.req_data						TO  DB.receive_data_req;
+		FROM DB.transmit_data					TO  SA.receive_data;
+		FROM SB.req_data						TO  DB.receive_data_req;
+		FROM DB.transmit_data					TO  SB.receive_data;
+		FROM SA.transmit_result_best_path		TO  NU.receive;
+		FROM SB.transmit_result_best_path		TO  NU.receive;
+		
+		
+		FROM NU.forward                          TO  MA[1].receive_best_path;
+		FROM NU.forward                          TO  MA[2].receive_best_path;
+		FROM NU.forward                          TO  MA[3].receive_best_path;
+		FROM NU.forward                          TO  MA[4].receive_best_path;
+		FROM NU.forward                          TO  MA[5].receive_best_path
+		
+
+END

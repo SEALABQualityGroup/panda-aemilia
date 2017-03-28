@@ -1,0 +1,13 @@
+Stationary value of the performance measures for boa:
+
+- Value of measure "LoadBalancer_throughtput_pathA":
+	36.6602
+
+- Value of measure "LoadBalancer_throughtput_pathB":
+	18.3301
+
+- Value of measure "DB_utilization":
+	0.999825
+
+- Value of measure "MA_throughput":
+	54.9904

@@ -1,0 +1,1005 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<mmaemilia:AEmiliaSpecification xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Behavior="http://behavior.ecore" xmlns:DataType="http://datatype.ecore" xmlns:Expressions="http://expressions.ecore" xmlns:mmaemilia="http://mmaemilia.ecore">
+  <archiTypeDecl atName="ABP_GD_Type">
+    <aetDeclaration>
+      <etDeclaration etName="Msg_Gen_Type">
+        <iiDecl intName="elapse_tick"/>
+        <oiDecl intName="generate_msg"/>
+        <elemHeader>
+          <costant name="msg_gen_rate">
+            <constantData xsi:type="DataType:Real"/>
+          </costant>
+        </elemHeader>
+        <behaviorDecl>
+          <equations name="Msg_Gen">
+            <bHeader>
+              <left>
+                <initVar name="time_to_gen_next">
+                  <initVarExpr xsi:type="Expressions:MathFunctions" name="ceil">
+                    <leftExprMath xsi:type="Expressions:Pseudo_random_num_gen" name="exponential">
+                      <firstNumGenOp xsi:type="Expressions:IdentExpr" name="msg_gen_rate"/>
+                    </leftExprMath>
+                  </initVarExpr>
+                  <initVarType xsi:type="DataType:Integer"/>
+                </initVar>
+                <initVar name="msg_to_send">
+                  <initVarExpr xsi:type="Expressions:IdentExpr" name="0" type="NUMERIC_CONST"/>
+                  <initVarType xsi:type="DataType:Integer"/>
+                </initVar>
+              </left>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ChoiceProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator=">=">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="msg_to_send"/>
+                  <rightExprRel xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                </condition>
+                <processes xsi:type="Behavior:ActionProcess">
+                  <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.0/@behaviorDecl/@equations.1">
+                    <exprs xsi:type="Expressions:IdentExpr" name="time_to_gen_next"/>
+                    <exprs xsi:type="Expressions:ArithExpr" operator="-">
+                      <leftExprArith xsi:type="Expressions:IdentExpr" name="msg_to_send"/>
+                      <rightExprArith xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                    </exprs>
+                  </process>
+                  <act name="generate_msg" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.0/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.0">
+                    <rate xsi:type="Behavior:RateInf">
+                      <inf_priority xsi:type="Expressions:IdentExpr" name="3" type="NUMERIC_CONST"/>
+                      <inf_weight xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                    </rate>
+                  </act>
+                </processes>
+                <processes xsi:type="Behavior:ActionProcess">
+                  <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.0/@behaviorDecl/@equations.1">
+                    <exprs xsi:type="Expressions:IdentExpr" name="time_to_gen_next"/>
+                    <exprs xsi:type="Expressions:IdentExpr" name="msg_to_send"/>
+                  </process>
+                  <act name="idle" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3">
+                    <rate xsi:type="Behavior:RateInf"/>
+                  </act>
+                </processes>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator="=">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="msg_to_send"/>
+                  <rightExprRel xsi:type="Expressions:IdentExpr" name="0" type="NUMERIC_CONST"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.0/@behaviorDecl/@equations.1">
+                  <exprs xsi:type="Expressions:IdentExpr" name="time_to_gen_next"/>
+                  <exprs xsi:type="Expressions:IdentExpr" name="msg_to_send"/>
+                </process>
+                <act name="idle" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3">
+                  <rate xsi:type="Behavior:RateInf"/>
+                </act>
+              </processes>
+            </pt>
+          </equations>
+          <equations name="Msg_Gen_Updating">
+            <bHeader>
+              <left>
+                <varDef name="time_to_gen_next">
+                  <varType xsi:type="DataType:Integer"/>
+                </varDef>
+                <varDef name="msg_to_send">
+                  <varType xsi:type="DataType:Integer"/>
+                </varDef>
+              </left>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator="=">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="time_to_gen_next"/>
+                  <rightExprRel xsi:type="Expressions:IdentExpr" name="0" type="NUMERIC_CONST"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.0/@behaviorDecl/@equations.0">
+                  <exprs xsi:type="Expressions:MathFunctions" name="ceil">
+                    <leftExprMath xsi:type="Expressions:Pseudo_random_num_gen" name="exponential">
+                      <firstNumGenOp xsi:type="Expressions:IdentExpr" name="msg_gen_rate"/>
+                    </leftExprMath>
+                  </exprs>
+                  <exprs xsi:type="Expressions:ArithExpr">
+                    <leftExprArith xsi:type="Expressions:IdentExpr" name="msg_to_send"/>
+                    <rightExprArith xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                  </exprs>
+                </process>
+                <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="time_to_gen_next"/>
+                  <rightExprRel xsi:type="Expressions:IdentExpr" name="0" type="NUMERIC_CONST"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.0/@behaviorDecl/@equations.0">
+                  <exprs xsi:type="Expressions:ArithExpr" operator="-">
+                    <leftExprArith xsi:type="Expressions:IdentExpr" name="time_to_gen_next"/>
+                    <rightExprArith xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                  </exprs>
+                  <exprs xsi:type="Expressions:IdentExpr" name="msg_to_send"/>
+                </process>
+                <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+            </pt>
+          </equations>
+        </behaviorDecl>
+      </etDeclaration>
+      <etDeclaration etName="Sender_Type">
+        <iiDecl intName="get_msg"/>
+        <iiDecl intName="receive_ack"/>
+        <iiDecl intName="elapse_tick"/>
+        <oiDecl intName="transmit_msg"/>
+        <elemHeader>
+          <costant name="starting_bit">
+            <constantData xsi:type="DataType:Boolean"/>
+          </costant>
+          <costant name="timeout_period">
+            <constantData xsi:type="DataType:Integer"/>
+          </costant>
+        </elemHeader>
+        <behaviorDecl>
+          <equations name="Sender">
+            <bHeader>
+              <left>
+                <initVar name="sent_bit">
+                  <initVarExpr xsi:type="Expressions:IdentExpr" name="starting_bit"/>
+                  <initVarType xsi:type="DataType:Boolean"/>
+                </initVar>
+              </left>
+              <right>
+                <localDef name="received_bit">
+                  <localType xsi:type="DataType:Boolean"/>
+                </localDef>
+              </right>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.1">
+                  <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                </process>
+                <act name="get_msg" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@iiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1">
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:ActionProcess">
+                  <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.0">
+                    <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                  </process>
+                  <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                    <rate xsi:type="Behavior:RatePas"/>
+                  </act>
+                </process>
+                <act name="receive_ack" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@iiDecl.1" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1">
+                  <type xsi:type="Behavior:ActionInput">
+                    <var>received_bit</var>
+                  </type>
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.0">
+                  <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                </process>
+                <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+            </pt>
+          </equations>
+          <equations name="Sender_Transmitting">
+            <bHeader>
+              <left>
+                <varDef name="sent_bit">
+                  <varType xsi:type="DataType:Boolean"/>
+                </varDef>
+              </left>
+              <right>
+                <localDef name="received_bit">
+                  <localType xsi:type="DataType:Boolean"/>
+                </localDef>
+              </right>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:ActionProcess">
+                  <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.2">
+                    <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                    <exprs xsi:type="Expressions:IdentExpr" name="timeout_period"/>
+                  </process>
+                  <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                    <rate xsi:type="Behavior:RatePas"/>
+                  </act>
+                </process>
+                <act name="transmit_msg" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1">
+                  <type xsi:type="Behavior:ActionOutput">
+                    <exprOutput xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                  </type>
+                  <rate xsi:type="Behavior:RateInf">
+                    <inf_priority xsi:type="Expressions:IdentExpr" name="2" type="NUMERIC_CONST"/>
+                    <inf_weight xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                  </rate>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:ActionProcess">
+                  <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.1">
+                    <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                  </process>
+                  <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                    <rate xsi:type="Behavior:RatePas"/>
+                  </act>
+                </process>
+                <act name="receive_ack" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@iiDecl.1" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1">
+                  <type xsi:type="Behavior:ActionInput">
+                    <var>received_bit</var>
+                  </type>
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.1">
+                  <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                </process>
+                <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+            </pt>
+          </equations>
+          <equations name="Sender_Waiting">
+            <bHeader>
+              <left>
+                <varDef name="sent_bit">
+                  <varType xsi:type="DataType:Boolean"/>
+                </varDef>
+                <varDef name="time_to_timeout">
+                  <varType xsi:type="DataType:Integer"/>
+                </varDef>
+              </left>
+              <right>
+                <localDef name="received_bit">
+                  <localType xsi:type="DataType:Boolean"/>
+                </localDef>
+              </right>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ChoiceProcess">
+                <condition xsi:type="Expressions:RelationalExpr">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="time_to_timeout"/>
+                  <rightExprRel xsi:type="Expressions:IdentExpr" name="0" type="NUMERIC_CONST"/>
+                </condition>
+                <processes xsi:type="Behavior:ActionProcess">
+                  <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.3">
+                    <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                    <exprs xsi:type="Expressions:IdentExpr" name="time_to_timeout"/>
+                    <exprs xsi:type="Expressions:IdentExpr" name="received_bit"/>
+                  </process>
+                  <act name="receive_ack" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@iiDecl.1" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1">
+                    <type xsi:type="Behavior:ActionInput">
+                      <var>received_bit</var>
+                    </type>
+                    <rate xsi:type="Behavior:RatePas"/>
+                  </act>
+                </processes>
+                <processes xsi:type="Behavior:ActionProcess">
+                  <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.2">
+                    <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                    <exprs xsi:type="Expressions:ArithExpr" operator="-">
+                      <leftExprArith xsi:type="Expressions:IdentExpr" name="time_to_timeout"/>
+                      <rightExprArith xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                    </exprs>
+                  </process>
+                  <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                    <rate xsi:type="Behavior:RatePas"/>
+                  </act>
+                </processes>
+              </processes>
+              <processes xsi:type="Behavior:ChoiceProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator="=">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="time_to_timeout"/>
+                  <rightExprRel xsi:type="Expressions:IdentExpr" name="0" type="NUMERIC_CONST"/>
+                </condition>
+                <processes xsi:type="Behavior:ActionProcess">
+                  <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.5">
+                    <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                  </process>
+                  <act name="timeout" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1">
+                    <rate xsi:type="Behavior:RateInf">
+                      <inf_priority xsi:type="Expressions:IdentExpr" name="2" type="NUMERIC_CONST"/>
+                      <inf_weight xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                    </rate>
+                  </act>
+                </processes>
+                <processes xsi:type="Behavior:ActionProcess">
+                  <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.4">
+                    <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                    <exprs xsi:type="Expressions:IdentExpr" name="received_bit"/>
+                  </process>
+                  <act name="receive_ack" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@iiDecl.1" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1">
+                    <type xsi:type="Behavior:ActionInput">
+                      <var>received_bit</var>
+                    </type>
+                    <rate xsi:type="Behavior:RatePas"/>
+                  </act>
+                </processes>
+              </processes>
+            </pt>
+          </equations>
+          <equations name="Sender_Checking_1">
+            <bHeader>
+              <left>
+                <varDef name="sent_bit">
+                  <varType xsi:type="DataType:Boolean"/>
+                </varDef>
+                <varDef name="time_to_timeout">
+                  <varType xsi:type="DataType:Integer"/>
+                </varDef>
+                <varDef name="received_bit">
+                  <varType xsi:type="DataType:Boolean"/>
+                </varDef>
+              </left>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator="=">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="received_bit"/>
+                  <rightExprRel xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.0">
+                  <exprs xsi:type="Expressions:BooleanExpr">
+                    <rightExprBool xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                  </exprs>
+                </process>
+                <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator="!=">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="received_bit"/>
+                  <rightExprRel xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.2">
+                  <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                  <exprs xsi:type="Expressions:ArithExpr" operator="-">
+                    <leftExprArith xsi:type="Expressions:IdentExpr" name="time_to_timeout"/>
+                    <rightExprArith xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                  </exprs>
+                </process>
+                <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+            </pt>
+          </equations>
+          <equations name="Sender_Checking_2">
+            <bHeader>
+              <left>
+                <varDef name="sent_bit">
+                  <varType xsi:type="DataType:Boolean"/>
+                </varDef>
+                <varDef name="received_bit">
+                  <varType xsi:type="DataType:Boolean"/>
+                </varDef>
+              </left>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator="=">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="received_bit"/>
+                  <rightExprRel xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.0">
+                  <exprs xsi:type="Expressions:BooleanExpr">
+                    <rightExprBool xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                  </exprs>
+                </process>
+                <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator="!=">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="received_bit"/>
+                  <rightExprRel xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.5">
+                  <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                </process>
+                <act name="idle" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3">
+                  <rate xsi:type="Behavior:RateInf"/>
+                </act>
+              </processes>
+            </pt>
+          </equations>
+          <equations name="Sender_Retransmitting">
+            <bHeader>
+              <left>
+                <varDef name="sent_bit">
+                  <varType xsi:type="DataType:Boolean"/>
+                </varDef>
+              </left>
+              <right>
+                <localDef name="received_bit">
+                  <localType xsi:type="DataType:Boolean"/>
+                </localDef>
+              </right>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:ActionProcess">
+                  <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.2">
+                    <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                    <exprs xsi:type="Expressions:IdentExpr" name="timeout_period"/>
+                  </process>
+                  <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                    <rate xsi:type="Behavior:RatePas"/>
+                  </act>
+                </process>
+                <act name="transmit_msg" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1">
+                  <type xsi:type="Behavior:ActionOutput">
+                    <exprOutput xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                  </type>
+                  <rate xsi:type="Behavior:RateInf">
+                    <inf_priority xsi:type="Expressions:IdentExpr" name="2" type="NUMERIC_CONST"/>
+                    <inf_weight xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                  </rate>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.4">
+                  <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                  <exprs xsi:type="Expressions:IdentExpr" name="received_bit"/>
+                </process>
+                <act name="receive_ack" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@iiDecl.1" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1">
+                  <type xsi:type="Behavior:ActionInput">
+                    <var>received_bit</var>
+                  </type>
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@behaviorDecl/@equations.5">
+                  <exprs xsi:type="Expressions:IdentExpr" name="sent_bit"/>
+                </process>
+                <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+            </pt>
+          </equations>
+        </behaviorDecl>
+      </etDeclaration>
+      <etDeclaration etName="Line_Type">
+        <iiDecl intName="receive"/>
+        <iiDecl intName="elapse_tick"/>
+        <oiDecl intName="deliver"/>
+        <elemHeader>
+          <costant name="prop_delay_mean">
+            <constantData xsi:type="DataType:Real"/>
+          </costant>
+          <costant name="prop_delay_st_dev">
+            <constantData xsi:type="DataType:Real"/>
+          </costant>
+          <costant name="delivery_prob">
+            <constantData xsi:type="DataType:Special" type="weight"/>
+          </costant>
+        </elemHeader>
+        <behaviorDecl>
+          <equations name="Line">
+            <bHeader>
+              <left>
+                <initVar name="prop_queue">
+                  <initVarExpr xsi:type="Expressions:ListExpr"/>
+                  <initVarType xsi:type="DataType:List">
+                    <listElemType xsi:type="DataType:Record">
+                      <field_decl_seq>integer time_to_delivery , boolean tag</field_decl_seq>
+                    </listElemType>
+                  </initVarType>
+                </initVar>
+              </left>
+              <right>
+                <localDef name="tagging_bit">
+                  <localType xsi:type="DataType:Boolean"/>
+                </localDef>
+              </right>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:ChoiceProcess">
+                  <processes xsi:type="Behavior:ActionProcess">
+                    <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@behaviorDecl/@equations.1">
+                      <exprs xsi:type="Expressions:ListExpr" operation="concat">
+                        <list_operands xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                        <list_operands xsi:type="Expressions:ListExpr" operation="concat">
+                          <list_operands xsi:type="Expressions:RecordExpr">
+                            <record_operands xsi:type="Expressions:MathFunctions" name="ceil">
+                              <leftExprMath xsi:type="Expressions:Pseudo_random_num_gen" name="normal">
+                                <firstNumGenOp xsi:type="Expressions:IdentExpr" name="prop_delay_mean"/>
+                                <secondNumGenOp xsi:type="Expressions:IdentExpr" name="prop_delay_st_dev"/>
+                              </leftExprMath>
+                            </record_operands>
+                            <record_operands xsi:type="Expressions:IdentExpr" name="tagging_bit"/>
+                          </list_operands>
+                        </list_operands>
+                      </exprs>
+                    </process>
+                    <act name="keep" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2">
+                      <rate xsi:type="Behavior:RateInf">
+                        <inf_priority xsi:type="Expressions:IdentExpr" name="2" type="NUMERIC_CONST"/>
+                        <inf_weight xsi:type="Expressions:IdentExpr" name="delivery_prob"/>
+                      </rate>
+                    </act>
+                  </processes>
+                  <processes xsi:type="Behavior:ActionProcess">
+                    <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@behaviorDecl/@equations.1">
+                      <exprs xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                    </process>
+                    <act name="lose" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2">
+                      <rate xsi:type="Behavior:RateInf">
+                        <inf_priority xsi:type="Expressions:IdentExpr" name="2" type="NUMERIC_CONST"/>
+                        <inf_weight xsi:type="Expressions:ArithExpr" operator="-">
+                          <leftExprArith xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                          <rightExprArith xsi:type="Expressions:IdentExpr" name="delivery_prob"/>
+                        </inf_weight>
+                      </rate>
+                    </act>
+                  </processes>
+                </process>
+                <act name="receive" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@iiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2">
+                  <type xsi:type="Behavior:ActionInput">
+                    <var>tagging_bit</var>
+                  </type>
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@behaviorDecl/@equations.1">
+                  <exprs xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                </process>
+                <act name="idle" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3">
+                  <rate xsi:type="Behavior:RateInf"/>
+                </act>
+              </processes>
+            </pt>
+          </equations>
+          <equations name="Line_Delivering">
+            <bHeader>
+              <left>
+                <varDef name="prop_queue">
+                  <varType xsi:type="DataType:List">
+                    <listElemType xsi:type="DataType:Record">
+                      <field_decl_seq>integer time_to_delivery , boolean tag</field_decl_seq>
+                    </listElemType>
+                  </varType>
+                </varDef>
+              </left>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator="&lt;=">
+                  <leftExprRel xsi:type="Expressions:BooleanExpr" operator="&amp;&amp;">
+                    <leftExprBool xsi:type="Expressions:RelationalExpr" operator="!=">
+                      <leftExprRel xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                      <rightExprRel xsi:type="Expressions:ListExpr"/>
+                    </leftExprBool>
+                    <rightExprBool xsi:type="Expressions:RecordExpr" operation="get">
+                      <record_operands xsi:type="Expressions:IdentExpr" name="time_to_delivery"/>
+                      <record_operands xsi:type="Expressions:ListExpr" operation="first">
+                        <list_operands xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                      </record_operands>
+                    </rightExprBool>
+                  </leftExprRel>
+                  <rightExprRel xsi:type="Expressions:IdentExpr" name="0" type="NUMERIC_CONST"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@behaviorDecl/@equations.2">
+                  <exprs xsi:type="Expressions:ListExpr" operation="tail">
+                    <list_operands xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                  </exprs>
+                </process>
+                <act name="deliver" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2">
+                  <type xsi:type="Behavior:ActionOutput">
+                    <exprOutput xsi:type="Expressions:RecordExpr" operation="get">
+                      <record_operands xsi:type="Expressions:IdentExpr" name="tag"/>
+                      <record_operands xsi:type="Expressions:ListExpr" operation="first">
+                        <list_operands xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                      </record_operands>
+                    </exprOutput>
+                  </type>
+                  <rate xsi:type="Behavior:RateInf">
+                    <inf_priority xsi:type="Expressions:IdentExpr" name="3" type="NUMERIC_CONST"/>
+                    <inf_weight xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                  </rate>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr">
+                  <leftExprRel xsi:type="Expressions:BooleanExpr" operator="||">
+                    <leftExprBool xsi:type="Expressions:RelationalExpr" operator="=">
+                      <leftExprRel xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                      <rightExprRel xsi:type="Expressions:ListExpr"/>
+                    </leftExprBool>
+                    <rightExprBool xsi:type="Expressions:RecordExpr" operation="get">
+                      <record_operands xsi:type="Expressions:IdentExpr" name="time_to_delivery"/>
+                      <record_operands xsi:type="Expressions:ListExpr" operation="first">
+                        <list_operands xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                      </record_operands>
+                    </rightExprBool>
+                  </leftExprRel>
+                  <rightExprRel xsi:type="Expressions:IdentExpr" name="0" type="NUMERIC_CONST"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@behaviorDecl/@equations.2">
+                  <exprs xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                </process>
+                <act name="idle" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3">
+                  <rate xsi:type="Behavior:RateInf"/>
+                </act>
+              </processes>
+            </pt>
+          </equations>
+          <equations name="Line_Propagating">
+            <bHeader>
+              <left>
+                <varDef name="prop_queue">
+                  <varType xsi:type="DataType:List">
+                    <listElemType xsi:type="DataType:Record">
+                      <field_decl_seq>integer time_to_delivery , boolean tag</field_decl_seq>
+                    </listElemType>
+                  </varType>
+                </varDef>
+              </left>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator="!=">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                  <rightExprRel xsi:type="Expressions:ListExpr"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@behaviorDecl/@equations.3">
+                  <exprs xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                  <exprs xsi:type="Expressions:ListExpr"/>
+                </process>
+                <act name="propagate" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2">
+                  <rate xsi:type="Behavior:RateInf">
+                    <inf_priority xsi:type="Expressions:IdentExpr" name="2" type="NUMERIC_CONST"/>
+                    <inf_weight xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                  </rate>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator="=">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                  <rightExprRel xsi:type="Expressions:ListExpr"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@behaviorDecl/@equations.0">
+                  <exprs xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                </process>
+                <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+            </pt>
+          </equations>
+          <equations name="Line_Updating">
+            <bHeader>
+              <left>
+                <varDef name="prop_queue">
+                  <varType xsi:type="DataType:List">
+                    <listElemType xsi:type="DataType:Record">
+                      <field_decl_seq>integer time_to_delivery , boolean tag</field_decl_seq>
+                    </listElemType>
+                  </varType>
+                </varDef>
+                <varDef name="new_prop_queue">
+                  <varType xsi:type="DataType:List">
+                    <listElemType xsi:type="DataType:Record">
+                      <field_decl_seq>integer time_to_delivery , boolean tag</field_decl_seq>
+                    </listElemType>
+                  </varType>
+                </varDef>
+              </left>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator="!=">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                  <rightExprRel xsi:type="Expressions:ListExpr"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@behaviorDecl/@equations.3">
+                  <exprs xsi:type="Expressions:ListExpr" operation="tail">
+                    <list_operands xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                  </exprs>
+                  <exprs xsi:type="Expressions:ListExpr" operation="concat">
+                    <list_operands xsi:type="Expressions:IdentExpr" name="new_prop_queue"/>
+                    <list_operands xsi:type="Expressions:ListExpr">
+                      <list_operands xsi:type="Expressions:RecordExpr">
+                        <record_operands xsi:type="Expressions:ArithExpr" operator="-">
+                          <leftExprArith xsi:type="Expressions:RecordExpr" operation="get">
+                            <record_operands xsi:type="Expressions:IdentExpr" name="time_to_delivery"/>
+                            <record_operands xsi:type="Expressions:ListExpr" operation="first">
+                              <list_operands xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                            </record_operands>
+                          </leftExprArith>
+                          <rightExprArith xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                        </record_operands>
+                        <record_operands xsi:type="Expressions:RecordExpr" operation="get">
+                          <record_operands xsi:type="Expressions:IdentExpr" name="tag"/>
+                          <record_operands xsi:type="Expressions:ListExpr" operation="first">
+                            <list_operands xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                          </record_operands>
+                        </record_operands>
+                      </list_operands>
+                    </list_operands>
+                  </exprs>
+                </process>
+                <act name="compute_time_to_delivery" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2">
+                  <rate xsi:type="Behavior:RateInf">
+                    <inf_priority xsi:type="Expressions:IdentExpr" name="2" type="NUMERIC_CONST"/>
+                    <inf_weight xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                  </rate>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator="=">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="prop_queue"/>
+                  <rightExprRel xsi:type="Expressions:ListExpr"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@behaviorDecl/@equations.0">
+                  <exprs xsi:type="Expressions:IdentExpr" name="new_prop_queue"/>
+                </process>
+                <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+            </pt>
+          </equations>
+        </behaviorDecl>
+      </etDeclaration>
+      <etDeclaration etName="Receiver_Type">
+        <iiDecl intName="receive_msg"/>
+        <iiDecl intName="elapse_tick"/>
+        <oiDecl intName="consume_msg"/>
+        <oiDecl intName="transmit_ack"/>
+        <elemHeader>
+          <costant name="starting_bit">
+            <constantData xsi:type="DataType:Boolean"/>
+          </costant>
+        </elemHeader>
+        <behaviorDecl>
+          <equations name="Receiver">
+            <bHeader>
+              <left>
+                <initVar name="expected_bit">
+                  <initVarExpr xsi:type="Expressions:IdentExpr" name="starting_bit"/>
+                  <initVarType xsi:type="DataType:Boolean"/>
+                </initVar>
+              </left>
+              <right>
+                <localDef name="received_bit">
+                  <localType xsi:type="DataType:Boolean"/>
+                </localDef>
+              </right>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@behaviorDecl/@equations.1">
+                  <exprs xsi:type="Expressions:IdentExpr" name="expected_bit"/>
+                  <exprs xsi:type="Expressions:IdentExpr" name="received_bit"/>
+                </process>
+                <act name="receive_msg" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@iiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3">
+                  <type xsi:type="Behavior:ActionInput">
+                    <var>received_bit</var>
+                  </type>
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@behaviorDecl/@equations.0">
+                  <exprs xsi:type="Expressions:IdentExpr" name="expected_bit"/>
+                </process>
+                <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+            </pt>
+          </equations>
+          <equations name="Receiver_Checking">
+            <bHeader>
+              <left>
+                <varDef name="expected_bit">
+                  <varType xsi:type="DataType:Boolean"/>
+                </varDef>
+                <varDef name="received_bit">
+                  <varType xsi:type="DataType:Boolean"/>
+                </varDef>
+              </left>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator="=">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="received_bit"/>
+                  <rightExprRel xsi:type="Expressions:IdentExpr" name="expected_bit"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@behaviorDecl/@equations.2">
+                  <exprs xsi:type="Expressions:BooleanExpr">
+                    <rightExprBool xsi:type="Expressions:IdentExpr" name="expected_bit"/>
+                  </exprs>
+                  <exprs xsi:type="Expressions:IdentExpr" name="received_bit"/>
+                </process>
+                <act name="consume_msg" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3">
+                  <rate xsi:type="Behavior:RateInf">
+                    <inf_priority xsi:type="Expressions:IdentExpr" name="2" type="NUMERIC_CONST"/>
+                    <inf_weight xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                  </rate>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <condition xsi:type="Expressions:RelationalExpr" operator="!=">
+                  <leftExprRel xsi:type="Expressions:IdentExpr" name="received_bit"/>
+                  <rightExprRel xsi:type="Expressions:IdentExpr" name="expected_bit"/>
+                </condition>
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@behaviorDecl/@equations.2">
+                  <exprs xsi:type="Expressions:IdentExpr" name="expected_bit"/>
+                  <exprs xsi:type="Expressions:IdentExpr" name="received_bit"/>
+                </process>
+                <act name="idle" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3">
+                  <rate xsi:type="Behavior:RateInf"/>
+                </act>
+              </processes>
+            </pt>
+          </equations>
+          <equations name="Receiver_Transmitting">
+            <bHeader>
+              <left>
+                <varDef name="expected_bit">
+                  <varType xsi:type="DataType:Boolean"/>
+                </varDef>
+                <varDef name="received_bit">
+                  <varType xsi:type="DataType:Boolean"/>
+                </varDef>
+              </left>
+            </bHeader>
+            <pt xsi:type="Behavior:ChoiceProcess">
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:ActionProcess">
+                  <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@behaviorDecl/@equations.0">
+                    <exprs xsi:type="Expressions:IdentExpr" name="expected_bit"/>
+                  </process>
+                  <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                    <rate xsi:type="Behavior:RatePas"/>
+                  </act>
+                </process>
+                <act name="transmit_ack" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@oiDecl.1" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3">
+                  <type xsi:type="Behavior:ActionOutput">
+                    <exprOutput xsi:type="Expressions:IdentExpr" name="received_bit"/>
+                  </type>
+                  <rate xsi:type="Behavior:RateInf">
+                    <inf_priority xsi:type="Expressions:IdentExpr" name="2" type="NUMERIC_CONST"/>
+                    <inf_weight xsi:type="Expressions:IdentExpr" name="1" type="NUMERIC_CONST"/>
+                  </rate>
+                </act>
+              </processes>
+              <processes xsi:type="Behavior:ActionProcess">
+                <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@behaviorDecl/@equations.2">
+                  <exprs xsi:type="Expressions:IdentExpr" name="expected_bit"/>
+                  <exprs xsi:type="Expressions:IdentExpr" name="received_bit"/>
+                </process>
+                <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                  <rate xsi:type="Behavior:RatePas"/>
+                </act>
+              </processes>
+            </pt>
+          </equations>
+        </behaviorDecl>
+      </etDeclaration>
+      <etDeclaration etName="Clock_Type">
+        <oiDecl intName="elapse_tick" type="AND"/>
+        <elemHeader/>
+        <behaviorDecl>
+          <equations name="Clock">
+            <bHeader/>
+            <pt xsi:type="Behavior:ActionProcess">
+              <process xsi:type="Behavior:BehavProcess" eqCall="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@behaviorDecl/@equations.0"/>
+              <act name="elapse_tick" is="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0" belongs="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4">
+                <rate xsi:type="Behavior:RateInf"/>
+              </act>
+            </pt>
+          </equations>
+        </behaviorDecl>
+      </etDeclaration>
+    </aetDeclaration>
+    <atDeclaration>
+      <aeiDecl instanceName="MG" TypeOf="//@archiTypeDecl/@aetDeclaration/@etDeclaration.0">
+        <actualParam>msg_gen_rate</actualParam>
+      </aeiDecl>
+      <aeiDecl instanceName="S" TypeOf="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1">
+        <actualParam>starting_bit</actualParam>
+        <actualParam>timeout_period</actualParam>
+      </aeiDecl>
+      <aeiDecl instanceName="LM" TypeOf="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2">
+        <actualParam>prop_delay_mean</actualParam>
+        <actualParam>prop_delay_st_dev</actualParam>
+        <actualParam>delivery_prob</actualParam>
+      </aeiDecl>
+      <aeiDecl instanceName="LA" TypeOf="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2">
+        <actualParam>prop_delay_mean</actualParam>
+        <actualParam>prop_delay_st_dev</actualParam>
+        <actualParam>delivery_prob</actualParam>
+      </aeiDecl>
+      <aeiDecl instanceName="R" TypeOf="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3">
+        <actualParam>starting_bit</actualParam>
+      </aeiDecl>
+      <aeiDecl instanceName="C" TypeOf="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4"/>
+      <attDecl>
+        <end toInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.1" isInput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@iiDecl.0"/>
+        <start fromInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.0" isOutput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.0/@oiDecl.0"/>
+      </attDecl>
+      <attDecl>
+        <end toInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.2" isInput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@iiDecl.0"/>
+        <start fromInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.1" isOutput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@oiDecl.0"/>
+      </attDecl>
+      <attDecl>
+        <end toInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.4" isInput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@iiDecl.0"/>
+        <start fromInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.2" isOutput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@oiDecl.0"/>
+      </attDecl>
+      <attDecl>
+        <end toInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.3" isInput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@iiDecl.0"/>
+        <start fromInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.4" isOutput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@oiDecl.1"/>
+      </attDecl>
+      <attDecl>
+        <end toInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.1" isInput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.1/@iiDecl.1"/>
+        <start fromInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.3" isOutput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.2/@oiDecl.0"/>
+      </attDecl>
+      <attDecl>
+        <end toInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.0" isInput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@iiDecl.1"/>
+        <start fromInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.5" isOutput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0"/>
+      </attDecl>
+      <attDecl>
+        <end toInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.1" isInput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@iiDecl.1"/>
+        <start fromInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.5" isOutput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0"/>
+      </attDecl>
+      <attDecl>
+        <end toInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.2" isInput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@iiDecl.1"/>
+        <start fromInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.5" isOutput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0"/>
+      </attDecl>
+      <attDecl>
+        <end toInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.3" isInput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@iiDecl.1"/>
+        <start fromInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.5" isOutput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0"/>
+      </attDecl>
+      <attDecl>
+        <end toInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.4" isInput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@iiDecl.1"/>
+        <start fromInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.5" isOutput="//@archiTypeDecl/@aetDeclaration/@etDeclaration.4/@oiDecl.0"/>
+      </attDecl>
+      <aiDecl Is_A="//@archiTypeDecl/@aetDeclaration/@etDeclaration.3/@oiDecl.0" name="R.consume_msg" fromInstance="//@archiTypeDecl/@atDeclaration/@aeiDecl.4"/>
+    </atDeclaration>
+    <header>
+      <initConst name="starting_bit">
+        <initConstData xsi:type="DataType:Boolean"/>
+        <initConstExpr xsi:type="Expressions:IdentExpr" name="false" type="TRUTH_VAL"/>
+      </initConst>
+      <initConst name="msg_gen_rate">
+        <initConstData xsi:type="DataType:Real"/>
+        <initConstExpr xsi:type="Expressions:IdentExpr" name="0.005" type="NUMERIC_CONST"/>
+      </initConst>
+      <initConst name="timeout_period">
+        <initConstData xsi:type="DataType:Integer"/>
+        <initConstExpr xsi:type="Expressions:IdentExpr" name="1000" type="NUMERIC_CONST"/>
+      </initConst>
+      <initConst name="prop_delay_mean">
+        <initConstData xsi:type="DataType:Real"/>
+        <initConstExpr xsi:type="Expressions:IdentExpr" name="107.0" type="NUMERIC_CONST"/>
+      </initConst>
+      <initConst name="prop_delay_st_dev">
+        <initConstData xsi:type="DataType:Real"/>
+        <initConstExpr xsi:type="Expressions:IdentExpr" name="7.0" type="NUMERIC_CONST"/>
+      </initConst>
+      <initConst name="delivery_prob">
+        <initConstData xsi:type="DataType:Special" type="weight"/>
+        <initConstExpr xsi:type="Expressions:IdentExpr" name="0.95" type="NUMERIC_CONST"/>
+      </initConst>
+    </header>
+  </archiTypeDecl>
+</mmaemilia:AEmiliaSpecification>
