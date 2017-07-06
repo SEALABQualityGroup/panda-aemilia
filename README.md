@@ -1,5 +1,5 @@
 # Out-of-Date
-We are working on a new version, please stay tuned.
+We are working on a new version, stay tuned.
 
 # panda-aemilia
 
